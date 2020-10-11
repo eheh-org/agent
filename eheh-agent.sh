@@ -239,9 +239,9 @@ data_post="token=${auth[0]}&data=$(base "$version") $(base "$uptime") $(base "$s
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 30 wget --debug -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" --debug
+	timeout -s SIGKILL 45 wget -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" 
 else
-	wget --debug -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" --debug
+	wget  -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" 
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30
