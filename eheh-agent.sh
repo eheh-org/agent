@@ -18,7 +18,7 @@
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 # Agent version
-version="0.7.7"
+version=0.8.2
 
 # Authentication required
 if [ -f /etc/EHEH/eheh-auth.log ]
@@ -28,6 +28,22 @@ else
 	echo "Error: Authentication log is missing."
 	exit 1
 fi
+
+if [ -f /etc/EHEH/mysql_user ]
+then
+	mysql_user=($(cat /etc/EHEH/mysql_user))
+else
+  mysql_user=''
+fi
+
+if [ -f /etc/EHEH/mysql_pass ]
+then
+	mysql_pass=($(cat /etc/EHEH/mysql_pass))
+else
+  mysql_pass=''
+fi
+
+
 
 # Prepare values
 function prep ()
@@ -231,17 +247,46 @@ load_io=$(prep $(num "$load_io"))
 ping_eu=$(prep $(num "$(ping -c 2 -w 2 oss-eu-central-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
 ping_us=$(prep $(num "$(ping -c 2 -w 2 oss-us-west-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
 ping_as=$(prep $(num "$(ping -c 2 -w 2 oss-cn-hongkong.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+#亚太东南 -新加坡
+ping_se=$(prep $(num "$(ping -c 2 -w 2 oss-ap-southeast-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+#亚太东北 -日本
+ping_ne=$(prep $(num "$(ping -c 2 -w 2 oss-ap-northeast-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+#美国东部
+ping_us2=$(prep $(num "$(ping -c 2 -w 2 oss-us-east-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+#深圳
+ping_sz=$(prep $(num "$(ping -c 2 -w 2 oss-cn-shenzhen.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+#中东-迪拜
+ping_me=$(prep $(num "$(ping -c 2 -w 2 oss-me-east-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+
+
+# GET tcp count  of web service
+tcp_443=$(prep $(num "$(netstat -nat|grep -i "443" |wc -l)"))
+tcp_80=$(prep $(num "$(netstat -nat|grep -i "80" |wc -l)"))
+
+
+
+#Get mysql connections info
+#mysql_str=$(mysql  -u$user -p$pass -e "show variables like '%max_connections%';show status like 'Threads%'" )
+if [ -n "$(command -v mysql)" ]  &&  [ -n "$mysql_user" ] && [ -n  "$mysql_pass" ]
+then
+    mysql_str=$(mysql  -u$mysql_user -p$mysql_pass -e "show variables like '%max_connections%';show status like 'Threads%'" )
+    mysql_stat=$(prep "$(echo $mysql_str | awk '{print $4,$8,$10,$12,$14}')")
+else
+  mysql_stat="0 0 0 0 0"
+fi
+
+
 
 # Build data for post
-data_post="token=${auth[0]}&data=$(base "$version") $(base "$uptime") $(base "$sessions") $(base "$processes") $(base "$processes_array") $(base "$file_handles") $(base "$file_handles_limit") $(base "$os_kernel") $(base "$os_name") $(base "$os_arch") $(base "$cpu_name") $(base "$cpu_cores") $(base "$cpu_freq") $(base "$ram_total") $(base "$ram_usage") $(base "$swap_total") $(base "$swap_usage") $(base "$disk_array") $(base "$disk_total") $(base "$disk_usage") $(base "$connections") $(base "$nic") $(base "$ipv4") $(base "$ipv6") $(base "$rx") $(base "$tx") $(base "$rx_gap") $(base "$tx_gap") $(base "$load") $(base "$load_cpu") $(base "$load_io") $(base "$ping_eu") $(base "$ping_us") $(base "$ping_as")"
+data_post="token=${auth[0]}&data=$(base "$version") $(base "$uptime") $(base "$sessions") $(base "$processes") $(base "$processes_array") $(base "$file_handles") $(base "$file_handles_limit") $(base "$os_kernel") $(base "$os_name") $(base "$os_arch") $(base "$cpu_name") $(base "$cpu_cores") $(base "$cpu_freq") $(base "$ram_total") $(base "$ram_usage") $(base "$swap_total") $(base "$swap_usage") $(base "$disk_array") $(base "$disk_total") $(base "$disk_usage") $(base "$connections") $(base "$nic") $(base "$ipv4") $(base "$ipv6") $(base "$rx") $(base "$tx") $(base "$rx_gap") $(base "$tx_gap") $(base "$load") $(base "$load_cpu") $(base "$load_io") $(base "$ping_eu") $(base "$ping_us") $(base "$ping_as")&ping_se=$(base "$ping_se")&ping_ne=$(base "$ping_ne")&ping_us2=$(base "$ping_us2")&ping_sz=$(base "$ping_sz")&ping_me=$(base "ping_me")&tcp80=$(base "$tcp_80")&tcp443=$(base "$tcp443")&mysql_stat=$(base "$mysql_stat")"
 #echo $data_post
 
 # API request with automatic termination
 if [ -n "$(command -v timeout)" ]
 then
-	timeout -s SIGKILL 45 wget -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" 
+	timeout -s SIGKILL 45 wget -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/v2"
 else
-	wget  -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/index" 
+	wget  -o /dev/null -O /etc/EHEH/eheh-agent.log -T 25 --post-data "$data_post" --no-check-certificate "https://eheh.org/api/v2"
 	wget_pid=$!
 	wget_counter=0
 	wget_timeout=30

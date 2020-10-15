@@ -14,7 +14,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-userdel EHEH 
 rm -Rf /etc/EHEH
+crontab -u EHEH -r
+userdel EHEH
 
 echo -e "|\n|   Done: The EHEH agent were removed\n|"

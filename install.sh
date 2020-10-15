@@ -35,12 +35,26 @@ then
 	exit 1
 fi
 
+
+#delete exits data
+echo "|" && read -p "|   It will delete old local data if exist ,Do you want to continue? 安装将删除本地的以前记录  [Y/n] " input_del
+if [ -z $input_del ] || [ $input_del == "Y" ] || [ $input_del == "y" ]
+then
+  #uninstall
+  rm -Rf /etc/EHEH
+  crontab -u EHEH -r
+  userdel EHEH
+else
+  exit 1
+fi
+
+
 # Check if crontab is installed
 if [ ! -n "$(command -v crontab)" ]
 then
 
 	# Confirm crontab installation
-	echo "|" && read -p "|   Crontab is required and could not be found. Do you want to install it? [Y/n] " input_variable_install
+	echo "|" && read -p "|   Crontab is required and could not be found. Do you want to install it?  [Y/n] " input_variable_install
 
 	# Attempt to install crontab
 	if [ -z $input_variable_install ] || [ $input_variable_install == "Y" ] || [ $input_variable_install == "y" ]
@@ -151,6 +165,28 @@ then
 
 	# Show success
 	echo -e "|\n|   Success: The EHEH agent has been installed\n|"
+	echo -e "|   Success: 安装完成\n|"
+
+  echo "|" && read -p "|   Do you want to monitoring MYSQL state? enter y if you want。你想监控mysql状态吗，如果要请输入Y，我们将帮你设置  [Y/n] " input_mysql
+  if [ -z $input_mysql ] || [ $input_mysql == "Y" ] || [ $input_mysql == "y" ]
+  then
+        echo "|" && read -p "|   Enter your mysql username。请输入mysql用户名  " input_mu
+        $(echo "$input_mu" > /etc/EHEH/mysql-user)
+
+        echo "|" && read -p "|   Enter your mysql password。 请输入mysql密码  " input_mp
+        $(echo "$input_mp" > /etc/EHEH/mysql-pass)
+
+        echo -e "|\n|   Done,完成设置"
+  fi
+
+  #push data at once ?
+  echo "|" && read -p "|   Do you want to push data at once，or please wait for 5 minutes? 需要马上推送数据吗？或等5/6分钟  [Y/n] " push
+  if [ -z $push ] || [ $push == "Y" ] || [ $push == "y" ]
+  then
+    sh /etc/EHEH/eheh-agent.sh
+  fi
+
+  echo -e "|\n|   Done: Enjoy your EHEH！完成安装！EHEH.ORG 上见\n|"
 
 	# Attempt to delete installation script
 	if [ -f $0 ]
