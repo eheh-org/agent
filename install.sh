@@ -185,6 +185,7 @@ then
   if [ $push == "Y" ] || [ $push == "y" ]
   then
     sh /etc/EHEH/eheh-agent.sh
+    chown -Rf EHEH.EHEH /etc/EHEH/
   fi
 
   echo -e "|\n| 完成安装！EHEH.ORG 上见\n|"
