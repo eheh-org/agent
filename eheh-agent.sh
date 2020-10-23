@@ -244,19 +244,19 @@ load_cpu=$(prep $(num "$load_cpu"))
 load_io=$(prep $(num "$load_io"))
 
 # Get network latency
-ping_eu=$(prep $(num "$(ping -c 2 -w 2 oss-eu-central-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
-ping_us=$(prep $(num "$(ping -c 2 -w 2 oss-us-west-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
-ping_as=$(prep $(num "$(ping -c 2 -w 2 oss-cn-hongkong.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_eu=$(prep $(num "$(ping -c 2 -w 2 oss-eu-central-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_us=$(prep $(num "$(ping -c 2 -w 2 oss-us-west-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_as=$(prep $(num "$(ping -c 2 -w 2 oss-cn-hongkong.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 #亚太东南 -新加坡
-ping_se=$(prep $(num "$(ping -c 2 -w 2 oss-ap-southeast-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_se=$(prep $(num "$(ping -c 2 -w 2 oss-ap-southeast-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 #亚太东北 -日本
-ping_ne=$(prep $(num "$(ping -c 2 -w 2 oss-ap-northeast-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_ne=$(prep $(num "$(ping -c 2 -w 2 oss-ap-northeast-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 #美国东部
-ping_us2=$(prep $(num "$(ping -c 2 -w 2 oss-us-east-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_us2=$(prep $(num "$(ping -c 2 -w 2 oss-us-east-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 #深圳
-ping_sz=$(prep $(num "$(ping -c 2 -w 2 oss-cn-shenzhen.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_sz=$(prep $(num "$(ping -c 2 -w 2 oss-cn-shenzhen.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 #中东-迪拜
-ping_me=$(prep $(num "$(ping -c 2 -w 2 oss-me-east-1.aliyuncs.com | grep rtt | cut -d'/' -f4 | awk '{ print $3 }')"))
+ping_me=$(prep $(num "$(ping -c 2 -w 2 oss-me-east-1.aliyuncs.com | grep avg | cut -d'/' -f4 | awk '{ print $3 }')"))
 
 
 # GET tcp count  of web service
