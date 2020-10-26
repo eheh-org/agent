@@ -264,8 +264,9 @@ then
 
  if [ -n "$(command -v apt-get)" ]
  then
-    printf  "$(_yellow "|   Debian/ubuntu的默认shell已经切换成了dash。如需马上推送一次数据，请手动执行以下命令")\n\n"
-    printf  "$(_blue "|   /etc/EHEH/eheh-agent.sh && chown -Rf EHEH.EHEH /etc/EHEH/") \n\n"
+    printf  "$(_yellow "|   Debian/ubuntu的默认shell已经切换成了dash。如需马上推送一次数据，请手动执行以下2条命令")\n\n"
+    printf  "$(_blue "|   /etc/EHEH/eheh-agent.sh ") \n\n"
+    printf  "$(_blue "|   chown -Rf EHEH.EHEH /etc/EHEH/") \n\n"
  else
       #push data at once ?
       echo "|" && read -p "|   需要马上推送数据吗？或等5/6分钟  [Y/n] " push
